@@ -5,6 +5,17 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+      - name: install-envsubst
+        image: alpine:3.17
+        command:
+          - sh
+          - -c
+          - |
+            wget -O /tools/envsubst https://github.com/a8m/envsubst && chmod +x /tools/envsubst
+        volumeMounts:
+          - name: tools
+            mountPath: /tools
       containers:
       - name: kustomize-build-with-helm
         command: [/var/run/argocd/argocd-cmp-server] # Entrypoint should be Argo CD lightweight CMP server i.e. argocd-cmp-server
@@ -26,7 +37,12 @@ spec:
           # mitigate path traversal attacks.
           - mountPath: /tmp
             name: cmp-tmp
+          - mountPath: /usr/local/bin/envsubst
+            name: tools
+            subPath: envsubst
       volumes:
+      - name: tools
+        emptyDir: {}
       - configMap:
           name: kustomize-build-with-helm
         name: kustomize-build-with-helm

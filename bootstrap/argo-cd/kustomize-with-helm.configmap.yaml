@@ -11,4 +11,4 @@ data:
     spec:
       generate:
         command: [ "sh", "-c" ]
-        args: [ "kustomize build --enable-helm" ]
+        args: [ "kustomize build --enable-helm | envsubst" ]
